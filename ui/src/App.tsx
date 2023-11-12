@@ -1,6 +1,6 @@
-import React from "react";
+import React, { useState } from "react";
 import "./App.css";
-import { Box, ChakraProvider } from "@chakra-ui/react";
+import { Box, ChakraProvider, Link } from "@chakra-ui/react";
 import {
   ApolloClient,
   InMemoryCache,
@@ -22,11 +22,38 @@ interface UsersResponse {
 
 function Users() {
   const { loading, data } = useQuery<{users: UsersResponse[]}>(GET_USERs);
+  let [page, setPage] = useState(1);
+  const limit = 10;
+  
 
+  function back() {
+    return(
+      start > 0 ? setPage(page - 1): null
+    )
+  }
+  function forward() {
+    return(
+      lent? end < lent ? setPage(page + 1) : null : null
+    )
+  }
+  const start = (page-1) * limit;
+  const end = start + limit;
+  const lent = data?.users.length
+  const totalPages = lent? Math.ceil(lent/limit) : 1
+
+  const newdata = data?.users.slice(start, end);
   return <>
-  {data?.users.map(user => <Box padding={5} key={user.id}>{user.name}</Box>)}
+  {newdata?.map(user => <Box padding={5} key={user.id}>{user.name}</Box>)}
+  <div>
+  <button onClick={back}>Prev</button>
+  <div className='text-xs'>
+        {page} / {totalPages}
+ </div>
+  <button onClick={forward}>Next</button>
+  </div>
   </>
 }
+
 
 function AppBody() {
   return (
